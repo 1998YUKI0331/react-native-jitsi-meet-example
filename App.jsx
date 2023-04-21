@@ -1,74 +1,56 @@
-import React, {useEffect} from 'react';
-import {View} from 'react-native';
 import JitsiMeet, {JitsiMeetView} from 'react-native-jitsi-meet';
+import React, {useState, useEffect} from 'react';
+import {StyleSheet, View, Pressable, Text} from 'react-native';
 
-const VideoCall = () => {
-  const onConferenceTerminated = () => {
-    console.log('onConferenceTerminated');
-  };
-
-  const onConferenceJoined = () => {
-    console.log('onConferenceJoined');
-  };
-
-  const onConferenceWillJoin = () => {
-    console.log('onConferenceWillJoin');
-  };
+function App() {
+  const [showJitsiView, setShowJitsiView] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      const url = 'https://meet.jit.si/deneme'; // can also be only room name and will connect to jitsi meet servers
-      const userInfo = {
-        displayName: 'User',
-        email: 'user@example.com',
-        avatar: 'https:/gravatar.com/avatar/abc123',
-      };
-      const options = {
-        audioMuted: false,
-        audioOnly: false,
-        videoMuted: false,
-        subject: 'your subject',
-        token: 'your token',
-      };
-      const meetFeatureFlags = {
-        addPeopleEnabled: true,
-        calendarEnabled: true,
-        callIntegrationEnabled: true,
-        chatEnabled: true,
-        closeCaptionsEnabled: true,
-        inviteEnabled: true,
-        androidScreenSharingEnabled: true,
-        liveStreamingEnabled: true,
-        meetingNameEnabled: true,
-        meetingPasswordEnabled: true,
-        pipEnabled: true,
-        kickOutEnabled: true,
-        conferenceTimerEnabled: true,
-        videoShareButtonEnabled: true,
-        recordingEnabled: true,
-        reactionsEnabled: true,
-        raiseHandEnabled: true,
-        tileViewEnabled: true,
-        toolboxAlwaysVisible: false,
-        toolboxEnabled: true,
-        welcomePageEnabled: false,
-      };
-      JitsiMeet.call(url, userInfo, options, meetFeatureFlags);
-      /* You can also use JitsiMeet.audioCall(url) for audio only call */
-      /* You can programmatically end the call with JitsiMeet.endCall() */
-    }, 1000);
-  }, []);
+    if (showJitsiView)
+      setTimeout(() => {
+        const url = 'https://meet.jit.si/exemple';
+        const userInfo = {
+          displayName: 'User',
+          email: 'user@example.com',
+          avatar: 'https:/gravatar.com/avatar/abc123',
+        };
+        JitsiMeet.call(url, userInfo);
+      }, 1000);
+  }, [showJitsiView]);
+
+  if (showJitsiView) {
+    return (
+      <JitsiMeetView
+        style={styles.jitsiMeetView}
+        onConferenceTerminated={_ => setShowJitsiView(false)}
+        onConferenceJoined={e => console.log(e.nativeEvent)}
+        onConferenceWillJoin={e => console.log(e.nativeEvent)}
+      />
+    );
+  }
 
   return (
-    <View style={{backgroundColor: 'black', flex: 1}}>
-      <JitsiMeetView
-        onConferenceTerminated={onConferenceTerminated}
-        onConferenceJoined={onConferenceJoined}
-        onConferenceWillJoin={onConferenceWillJoin}
-        style={{flex: 1, height: '100%', width: '100%'}}
-      />
+    <View style={styles.container}>
+      <Pressable
+        onPress={() => setShowJitsiView(true)}
+        style={{backgroundColor: 'pink', padding: 30}}>
+        <Text>Start Jitsi as a RN View</Text>
+      </Pressable>
     </View>
   );
-};
+}
 
-export default VideoCall;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  jitsiMeetView: {
+    flex: 1,
+    height: '100%',
+    width: '100%',
+  },
+});
+
+export default App;
